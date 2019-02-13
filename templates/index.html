@@ -1,0 +1,123 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <script>
+        $(document).ready(function(){
+            $("#dateFrom").datepicker({
+                // minDate:0,
+                maxDate:"+30D",
+                numberOfMonths: 1,
+                dateFormat: 'yy-mm-dd',
+                onSelect: function(selected) {
+                    $("#dateTo").datepicker("option","minDate", selected)
+                }
+            });
+            $("#dateTo").datepicker({
+                // minDate:0,
+                maxDate:"+30D", 
+                numberOfMonths: 1,
+                dateFormat: 'yy-mm-dd',
+                onSelect: function(selected) {
+                    $("#dateFrom").datepicker("option","maxDate", selected)
+                }
+            });  
+        });
+    </script>
+
+    <div class="date_row">        
+        <form action="/filter_result_by_date" method="POST">
+            <div class="calendar_row">
+                <div class="calendar_col">
+                    <input type="text" class="form-control" name="date_from" id="dateFrom">
+                </div>
+                <div class="calendar_icon">
+                    <i class="material-icons">calendar_today</i>
+                </div>
+                <div class="calendar_col">
+                    <input type="text" class="form-control" name="date_to" id="dateTo">
+                </div>
+                <div class="calendar_icon">
+                    <i class="material-icons">calendar_today</i>
+                </div>
+                <div class="calendar_col">
+                    <input type="submit" class="btn btn-primary" value="Update">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="table_row">
+        <p><u><b> List of all Customers and Number of Leads </b></u></p>
+        <table id="customersList" class="table table-striped table-bordered table-sm" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Number of Leads</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in customerList %}
+                    <tr>
+                        <td>{{ row['full_name'] }}</td>
+                        <td>{{ row['total_number'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>       
+        window.onload = function () {
+            
+            dataPoints = [
+                        { y: 48.36, label: "Windows 7" },
+                        { y: 26.85, label: "Windows 10" },
+                        { y: 1.49, label: "Windows 8" },
+                        { y: 6.98, label: "Windows XP" },
+                        { y: 6.53, label: "Windows 8.1" },
+                        { y: 2.45, label: "Linux" },
+                        { y: 3.32, label: "Mac OS X 10.12" },
+                        { y: 4.03, label: "Others" }                        
+                    ]
+            
+            // dataPoints = [
+            //     {% for row in customerList %}
+            //         { y: {{ row['total_number'] }}, label: "{{ row['full_name'] }}" }
+            //     {% endfor %}                 
+            // ]
+                  
+            var options = {
+                title: {
+                    text: "Customers and Number of new leads"
+                },
+                subtitles: [{
+                    text: ""
+                }],
+                animationEnabled: true,
+                data: [{
+                    type: "pie",
+                    startAngle: 40,
+                    toolTipContent: "<b>{label}</b>: {y}%",
+                    showInLegend: "true",
+                    legendText: "{label}",
+                    indexLabelFontSize: 13,
+                    indexLabel: "{label} - {y}%",
+                    dataPoints: dataPoints
+                }]
+            };
+            $("#graphRow").CanvasJSChart(options);
+        }
+    </script>
+
+    <div id="graphRow" class="graph_row">
+
+    </div>
+
+    <script>        
+        $(document).ready(function(){
+            $('#customersList').DataTable({
+                "pagingType" : "first_last_numbers"
+            });
+        });
+    </script>
+{% endblock %}
